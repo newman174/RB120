@@ -37,14 +37,19 @@ class GoodDog
   def self.what_am_i
     "I'm a GoodDog class!"
   end
+
+  def what_is_self
+    self
+  end
 end
 
-puts GoodDog.total_number_of_dogs
+# puts GoodDog.total_number_of_dogs
 
 sparky = GoodDog.new('Sparky', '12 inches', '10 lbs', 4)
-puts sparky.info
-spartacus = GoodDog.new('Spartacus', '24 inches', '45 lbs', 3)
-puts spartacus.info
+p sparky.what_is_self
+# puts sparky.info
+# spartacus = GoodDog.new('Spartacus', '24 inches', '45 lbs', 3)
+# puts spartacus.info
 
 # sparky.change_info('Spartacus', '24 inches', '45 lbs')
 # puts sparky.info
@@ -58,8 +63,8 @@ puts spartacus.info
 
 # puts GoodDog.what_am_i
 
-puts GoodDog.total_number_of_dogs
-puts sparky.age
-puts spartacus.age
-puts spartacus
-p spartacus
+# puts GoodDog.total_number_of_dogs
+# puts sparky.age
+# puts spartacus.age
+# puts spartacus
+# p spartacus
