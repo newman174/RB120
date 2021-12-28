@@ -25,7 +25,7 @@ Rule
 =end
 
 class Player
-  attr_reader :move
+  attr_accessor :move
 
   def initialize(player_type = :human)
     @player_type = player_type
@@ -79,7 +79,7 @@ class RPSGame
     @human = Player.new
     @computer = Player.new(:computer)
   end
-  
+
   def display_welcome_message
     puts "Welcome to Rock, Paper, Scissors!"    
   end
@@ -88,6 +88,26 @@ class RPSGame
     puts "Thanks for playing Rock, Paper, Scissors. Goodbye!"
   end
 
+  def display_winner
+    puts "You chose: #{human.move}"
+    puts "The computer chose: #{computer.move}"
+
+    case human.move
+    when 'rock'
+      puts "It's a tie!" if computer.move == 'rock'
+      puts "You won!" if computer.move == 'scissors'
+      puts "Computer won!" if computer.move == 'paper'
+    when 'paper'
+      puts "It's a tie!" if computer.move == 'paper'
+      puts "You won!" if computer.move == 'rock'
+      puts "Computer won!" if computer.move == 'scissors'
+    when 'scissors'
+      puts "It's a tie!" if computer.move == 'scissors'
+      puts "You won!" if computer.move == 'paper'
+      puts "Computer won!" if computer.move == 'rock'
+    end
+  end
+  
   def play
     display_welcome_message
     human.choose
