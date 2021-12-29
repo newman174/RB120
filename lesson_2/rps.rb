@@ -94,7 +94,7 @@ class RPSGame
   end
 
   def display_welcome_message
-    puts "Welcome to Rock, Paper, Scissors!"    
+    puts "Welcome to Rock, Paper, Scissors!"
   end
 
   def display_goodbye_message
@@ -131,13 +131,12 @@ class RPSGame
     end
 
     return true if answer == 'y'
-    return false
+    false
   end
 
   def play
     display_welcome_message
 
-    
     loop do
       human.choose
       computer.choose
