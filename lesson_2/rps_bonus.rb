@@ -100,11 +100,11 @@ class Move
   end
 end
 
-# class Rule
-#   def initialize
-#     # not sure what the "state" of a rule object should be
-#   end
-# end
+class Rule
+  def initialize
+    # not sure what the "state" of a rule object should be
+  end
+end
 
 # Game Orchestration Engine
 class RPSGame
@@ -171,17 +171,12 @@ class RPSGame
   end
 end
 
-class Match
+class Round < RPSGame
+  attr_accessor :player_choice, :computer_choice, :result
+
   def initialize
-    @@
-  end
-
-  def play
 
   end
-
-
 end
-
 
 RPSGame.new.play
