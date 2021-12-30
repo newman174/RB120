@@ -179,7 +179,7 @@ class Round < RPSGame
     display_winner
     break unless play_again?
   end
-  
+
   def play_again?
     answer = nil
     loop do
@@ -188,15 +188,15 @@ class Round < RPSGame
       break if ['y', 'n'].include? answer.downcase
       puts "Sorry, must be y or n."
     end
-    
+
     return false if answer.downcase == 'n'
     return true if answer.downcase == 'y'
   end
-  
+
   def display_welcome_message
     puts "Round #{round_num}:"
   end
-  
+
   def record_moves
     self.human_move = human.move
     self.computer_move = computer.move
@@ -212,8 +212,8 @@ class Round < RPSGame
       :tie
     end
   end
-  
-  def display_winner    
+
+  def display_winner
     case winner
     when :tie
       puts "It's a tie!"
