@@ -20,10 +20,27 @@ Rule
 
   - compare
 
+
+
+# RPS
+Display match welcome msg
+Get player name
+Play first round
+Unless game over, ask if next round
+Play next round
+Unless game over, ask if next round
+If game over
+	show score
+	declare winner
+Unless play again:
+	display goodbye message
+
+
+
 =end
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :wins
 
   def initialize
     set_name
@@ -100,24 +117,13 @@ class Move
   end
 end
 
-# class Rule
-#   def initialize
-#     # not sure what the "state" of a rule object should be
-#   end
-# end
-
-# Game Orchestration Engine
 class RPSGame
-  # @@score = 0
-  attr_accessor :human, :computer
+  attr_accessor :human, :computer, :round_num
 
-  def self.score
-    @@score
-  end
-
-  def initialize
-    @human = Human.new
-    @computer = Computer.new
+  def initialize(human, computer, round_num)
+    self.human = human
+    self.computer = computer
+    self.round_num = round_num
   end
 
   def display_welcome_message
@@ -152,8 +158,8 @@ class RPSGame
       puts "Sorry, must be y or n."
     end
 
-    return true if answer == 'y'
-    false
+    return false if answer.downcase == 'n'
+    return true if answer.downcase == 'y'
   end
 
   def play
@@ -169,4 +175,18 @@ class RPSGame
   end
 end
 
-RPSGame.new.play
+class RPSMatch
+  attr_accessor :scores, :rounds, :human, :computer
+
+  def initialize
+    @human = Human.new
+    @computer = Computer.new
+  end
+
+  def play(points_to_win: 10)
+    
+    loop do
+      RPSGame.new.play
+    end
+end
+
