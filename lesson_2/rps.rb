@@ -20,8 +20,6 @@ Rule
 
   - compare
 
-
-
 # RPS
 Display match welcome msg
 Get player name
@@ -30,20 +28,34 @@ Unless game over, ask if next round
 Play next round
 Unless game over, ask if next round
 If game over
-	show score
-	declare winner
+  show score
+  declare winner
 Unless play again:
-	display goodbye message
-
-
+  display goodbye message
 
 =end
 
 class Player
+  @@members = []
+
+  def self.members
+    @@members
+  end
+
   attr_accessor :move, :name, :wins
 
   def initialize
     set_name
+    @@members.push(self)
+    self.wins = 0
+  end
+
+  def record_win
+    self.wins = self.wins + 1
+  end
+
+  def to_s
+    self.name
   end
 end
 
@@ -117,13 +129,27 @@ class Move
   end
 end
 
-class RPSGame
-  attr_accessor :human, :computer, :round_num
+class RPSMatch
+  attr_accessor :rounds, :players, :human, :computer
 
-  def initialize(human, computer, round_num)
-    self.human = human
-    self.computer = computer
-    self.round_num = round_num
+  def initialize
+    self.human = Human.new
+    self.computer = Computer.new
+    self.players = [human, computer]
+    self.rounds = []
+  end
+
+  def play_again?(msg = "Would you like to play again?")
+    answer = nil
+    loop do
+      puts "#{msg} (y/n)"
+      answer = gets.chomp
+      break if ['y', 'n'].include? answer.downcase
+      puts "Sorry, must be y or n."
+    end
+
+    return false if answer.downcase == 'n'
+    return true if answer.downcase == 'y'
   end
 
   def display_welcome_message
@@ -134,59 +160,90 @@ class RPSGame
     puts "Thanks for playing Rock, Paper, Scissors. Goodbye!"
   end
 
+  def display_scores
+    players.each { |plyr| puts "#{plyr} | #{plyr.wins}" }
+  end
+
+  def declare_winner
+    winner = players.max_by(&:wins)
+    puts "#{winner} is the winner!"
+  end
+
+  def play(points_to_win = 3)
+    display_welcome_message
+    loop do
+      current_round = RPSRound.new(human, computer, rounds.size + 1)
+      current_round.play
+      rounds.push(current_round)
+      break if players.any? { |plyr| plyr.wins >= points_to_win }
+      display_scores
+    end
+    display_scores
+    declare_winner
+  end
+end
+
+class RPSRound
+  attr_accessor :human, :computer, :human_move, :computer_move, :round_num
+
+  def initialize(human, computer, round_num)
+    self.human = human
+    self.computer = computer
+    self.round_num = round_num
+  end
+
   def display_moves
     puts "#{human.name} chose: #{human.move}"
     puts "#{computer.name} chose: #{computer.move}"
   end
 
+  def winner
+    if @winner.nil?
+      @winner = if human.move > computer.move
+                      human
+                    elsif computer.move > human.move
+                      computer
+                    else
+                      :tie
+                    end
+    end
+    @winner
+  end
+
   def display_winner
-    if human.move > computer.move
-      puts "#{human.name} won!"
-    elsif human.move < computer.move
-      puts "#{computer.name} won!"
+    case winner
+    when :tie then puts "It's a tie!"
+    when nil then puts "Unknown"
     else
-      puts "It's a tie!"
+      puts "#{winner.name} won!"
     end
   end
 
-  def play_again?
-    answer = nil
-    loop do
-      puts "Would you like to play again? (y/n)"
-      answer = gets.chomp
-      break if ['y', 'n'].include? answer.downcase
-      puts "Sorry, must be y or n."
-    end
+  def display_new_round_message
+    puts "Round #{round_num}: Start!"
+  end
 
-    return false if answer.downcase == 'n'
-    return true if answer.downcase == 'y'
+  def record_moves
+    self.human_move = human.move
+    self.computer_move = computer.move
+  end
+
+  def record_win
+    winner.record_win unless winner == :tie
+  end
+
+  def players
+    [human, computer]
   end
 
   def play
-    display_welcome_message
-
-    loop do
-      human.choose
-      computer.choose
-      display_winner
-      break unless play_again?
-    end
-    display_goodbye_message
+    display_new_round_message
+    human.choose
+    computer.choose
+    record_moves
+    record_win
+    display_winner
   end
 end
 
-class RPSMatch
-  attr_accessor :scores, :rounds, :human, :computer
-
-  def initialize
-    @human = Human.new
-    @computer = Computer.new
-  end
-
-  def play(points_to_win: 10)
-    
-    loop do
-      RPSGame.new.play
-    end
-end
-
+RPSMatch.new.play
