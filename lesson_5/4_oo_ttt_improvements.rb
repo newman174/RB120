@@ -107,6 +107,31 @@ class TTTGame
     @current_marker = FIRST_TO_MOVE
   end
 
+  def play
+    clear
+    display_welcome_message
+
+    loop do
+      display_board
+
+      loop do
+        current_player_moves
+        break if board.someone_won? || board.full?
+        clear_screen_and_display_board if human_turn?
+      end
+
+      display_result
+      break unless play_again?
+
+      reset
+      display_play_again_message
+    end
+
+    display_goodbye_message
+  end
+
+  private
+
   def display_welcome_message
     puts "Welcome to Tic Tac Toe!\n"
   end
@@ -197,36 +222,6 @@ class TTTGame
     puts "Let's play again!\n"
   end
 
-  def play
-    clear
-    display_welcome_message
-
-    loop do
-      display_board
-
-      loop do
-        # human_moves
-        # break if board.someone_won? || board.full?
-
-        # computer_moves
-        # break if board.someone_won? || board.full?
-
-        # clear_screen_and_display_board
-        current_player_moves
-        break if board.someone_won? || board.full?
-        clear_screen_and_display_board if human_turn?
-        ## RESUME HERE TO IMPLEMENT THE ABOVE
-      end
-
-      display_result
-      break unless play_again?
-
-      reset
-      display_play_again_message
-    end
-
-    display_goodbye_message
-  end
 end
 
 game = TTTGame.new
