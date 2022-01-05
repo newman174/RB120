@@ -36,11 +36,11 @@ class Board
     end
     nil
   end
-  
+
   def reset
     (1..9).each { |key| @squares[key] = Square.new }
   end
-  
+
   def draw
     puts "     |     |"
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
@@ -56,9 +56,11 @@ class Board
   end
 
   private
+
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
     return false if markers.size != 3
+    
     markers.min == markers.max
   end
 end
@@ -117,6 +119,7 @@ class TTTGame
       loop do
         current_player_moves
         break if board.someone_won? || board.full?
+
         clear_screen_and_display_board if human_turn?
       end
 
@@ -159,6 +162,7 @@ class TTTGame
     loop do
       square = gets.chomp.to_i
       break if board.unmarked_keys.include?(square)
+      
       puts "Sorry, that's not a valid choice."
     end
 
@@ -221,7 +225,6 @@ class TTTGame
   def display_play_again_message
     puts "Let's play again!\n"
   end
-
 end
 
 game = TTTGame.new
