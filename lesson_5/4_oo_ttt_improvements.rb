@@ -10,8 +10,8 @@ class Board
     reset
   end
 
-  def []=(key, marker)
-    @squares[key].marker = marker
+  def []=(num, marker)
+    @squares[num].marker = marker
   end
 
   def unmarked_keys
