@@ -25,7 +25,7 @@ class Board
   def someone_won?
     !!winning_marker
   end
-  
+
   # return winning marker or nil
   def winning_marker
     WINNING_LINES.each do |line|
@@ -80,7 +80,7 @@ class Square
     marker == INITIAL_MARKER
   end
 
-  def marked
+  def marked?
     marker != INITIAL_MARKER
   end
 end
@@ -96,6 +96,7 @@ end
 class TTTGame
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
+  FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
 
@@ -103,6 +104,7 @@ class TTTGame
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
+    @current_marker = FIRST_TO_MOVE
   end
 
   def display_welcome_message
@@ -142,6 +144,20 @@ class TTTGame
     board[board.unmarked_keys.sample] = computer.marker
   end
 
+  def current_player_moves
+    if human_turn?
+      human_moves
+      @current_marker = COMPUTER_MARKER
+    else
+      computer_moves
+      @current_marker = HUMAN_MARKER
+    end
+  end
+
+  def human_turn?
+    @current_marker == HUMAN_MARKER
+  end
+
   def display_result
     clear_screen_and_display_board
 
@@ -173,6 +189,7 @@ class TTTGame
 
   def reset
     board.reset
+    @current_marker = FIRST_TO_MOVE
     clear
   end
 
@@ -188,13 +205,17 @@ class TTTGame
       display_board
 
       loop do
-        human_moves
-        break if board.someone_won? || board.full?
+        # human_moves
+        # break if board.someone_won? || board.full?
 
-        computer_moves
-        break if board.someone_won? || board.full?
+        # computer_moves
+        # break if board.someone_won? || board.full?
 
-        clear_screen_and_display_board
+        # clear_screen_and_display_board
+        current_player_moves
+        break if board.someone_won? || board.full?
+        clear_screen_and_display_board if human_turn?
+        ## RESUME HERE TO IMPLEMENT THE ABOVE
       end
 
       display_result
