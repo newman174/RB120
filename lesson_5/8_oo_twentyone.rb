@@ -40,6 +40,7 @@ Game
 =end
 
 require 'pry'
+require_relative 'game_display'
 
 module Prompt
   PROMPT_SYMBOL = ">> "
@@ -330,6 +331,25 @@ class Game
   end
 end
 
-game = Game.new
-game.play
+# game = Game.new
+# game.play
 # binding.pry
+
+frame = GameDisplay::Frame.new
+frame.add_line text: "Scores"
+frame.add_line text: "Mike: 1"
+frame.add_line text: "Comp: 1"
+
+# p frame.width
+# frame.print
+display = GameDisplay::Display.new
+display.show
+display.add_frame(frame)
+display.show
+
+puts "divider"
+frame2 = GameDisplay::Frame.new
+frame2.add_line text: "Some long msg:", align: :center
+frame2.add_line text: "warning: previous definition of TOP_BOTTOM_DIV_SYM was here"
+display.add_frame(frame2)
+display.show
