@@ -185,36 +185,6 @@ class Card
   end
 end
 
-module GameDisplay
-  
-  class Display
-    attr_accessor :frames
-
-    def initialize
-      self.frames = []
-    end
-
-    def show
-      frames.each(&:print)
-    end
-
-  class Frame
-    attr_accessor :lines
-
-    def initialize
-      self.lines = []
-    end
-
-    def width
-      lines.map { |line| line.length }.max
-    end
-
-    def print
-
-    end
-  end
-end
-
 class Game
   include Prompt
 
