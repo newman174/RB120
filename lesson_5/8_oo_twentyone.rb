@@ -130,6 +130,10 @@ class Dealer < Participant
   def hit?
     total < Game::DEALER_STAY_AT
   end
+
+  def reveal_cards
+    hand.each(&:reveal)
+  end
 end
 
 class Deck
@@ -182,23 +186,53 @@ class Card
     end
   end
 
-  def draw
+  def reveal
+    self.visible = true
   end
 end
 
 class Game
   include Prompt
 
+  RULES = <<-RULES
+Twenty-one is a card game consisting of a dealer and a player, where the
+participants try to get as close to 21 as possible without going over.
+
+Here is an overview of the game:
+- Both participants are initially dealt 2 cards from a 52-card deck.
+- The player takes the first turn, and can "hit" or "stay".
+- If the player busts, he loses. If he stays, it's the dealer's turn.
+- The dealer must hit until his cards add up until at least 17.
+- If he busts, the player wins. If both player and dealer stay, then the highest
+  total wins.
+- If both totals are equal, then it's a tie, and nobody wins.
+  RULES
+
   MAX_POINTS = 21
   DEALER_STAY_AT = 17
 
   attr_accessor :deck, :player, :dealer, :participants, :winner
+  attr_accessor :display, :scoreboard
 
   def initialize
     self.deck = Deck.new
     self.player = Player.new("Mike")
     self.dealer = Dealer.new("CPU Dealer")
-    self.participants = [player, dealer]
+    self.participants = [dealer, player]
+    self.display = GameDisplay::Display.new
+    # setup_scoreboard
+  end
+
+  # def setup_scoreboard
+  #   Scoreboard = Struct.new('Scoreboard', :player, :dealer, :ties, :frame)
+  #   self.scoreboard = Scoreboard.new
+  #   scoreboard.player = 0
+  #   scoreboard.dealer = 0
+  #   scoreboard.frame = GameDisplay::Frame.new
+  # end
+
+  def update_scores(scoreboard)
+
   end
 
   def deal_cards
@@ -208,7 +242,19 @@ class Game
   end
 
   def display_cards
-    participants.each { |part| part.display_hand }
+    card_disp = GameDisplay::Display.new
+    participants.each do |part|
+      frame = GameDisplay::Frame.new
+      names_line = frame.add_line(text: "#{part}", align: :center)
+      frame.add_line
+      part.hand.each do |card|
+        frame.add_line(text: card.to_s)
+      end
+      frame.add_line
+      frame.add_line(text: "Total: #{part.discreet_total}")
+      card_disp.add_frame(frame)
+    end
+    card_disp.show
   end
 
   def busted?(participant)
@@ -218,13 +264,18 @@ class Game
   def participant_turn(participant)
     loop do
       clear
-      prompt "#{participant}'s Turn", blank_lines: 1
       display_cards
+      prompt "#{participant}'s Turn", blank_lines: 1
+      enter_to_continue if participant == dealer
       if participant.hit?
         participant.hit(deck)
         clear
-        prompt "#{participant} hits and is dealt a #{participant.hand.last}"
         display_cards
+        prompt "#{participant}'s Turn", blank_lines: 1
+        prompt "Would you like to hit or stay? h/s"
+        puts 'h'
+        prompt "#{participant} hits and is dealt a #{participant.hand.last}"
+        enter_to_continue
 
         if busted?(participant)
           prompt "#{participant} busted!", blank_lines: 1
@@ -242,6 +293,7 @@ class Game
   end
 
   def dealer_turn
+    dealer.reveal_cards
     participant_turn(dealer)
   end
 
@@ -271,14 +323,32 @@ class Game
   def take_turns
     player_turn
     enter_to_continue
-    return if busted?(player)
+    if busted?(player)
+      dealer.reveal_cards
+      display_cards
+      return
+    end
     dealer_turn
+  end
+
+  def refresh_screen
+    display.show
+  end
+
+  def new_frame
+    GameDisplay::Frame.new
   end
 
   def display_welcome_screen
     clear
-    prompt "Welcome to Twenty One!\n"
-    prompt "[RULES]\n"
+    welcome_screen = GameDisplay::Display.new
+    top_frame = new_frame
+    welcome_screen.add_frame(top_frame)
+    top_frame.add_line(text: "*** Welcome to Twenty One! ***", align: :center)
+    top_frame.add_line
+    RULES.lines.each { |rule| top_frame.add_line(text: rule.chomp) }
+    welcome_screen.show
+    puts
     enter_to_continue
     clear
   end
@@ -291,6 +361,7 @@ class Game
   def reset
     self.deck = Deck.new
     participants.each { |part| part.reset_hand}
+    clear
     prompt "New Game!"
     enter_to_continue
     clear
@@ -320,7 +391,7 @@ class Game
     display_welcome_screen
     loop do
       deal_cards
-      display_cards
+      # display_cards
       take_turns
       show_result
       break unless play_again?
@@ -331,25 +402,5 @@ class Game
   end
 end
 
-# game = Game.new
-# game.play
-# binding.pry
-
-frame = GameDisplay::Frame.new
-frame.add_line text: "Scores"
-frame.add_line text: "Mike: 1"
-frame.add_line text: "Comp: 1"
-
-# p frame.width
-# frame.print
-display = GameDisplay::Display.new
-display.show
-display.add_frame(frame)
-display.show
-
-puts "divider"
-frame2 = GameDisplay::Frame.new
-frame2.add_line text: "Some long msg:", align: :center
-frame2.add_line text: "warning: previous definition of TOP_BOTTOM_DIV_SYM was here"
-display.add_frame(frame2)
-display.show
+game = Game.new
+game.play

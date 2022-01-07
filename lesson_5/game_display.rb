@@ -1,5 +1,4 @@
 module GameDisplay
-  
   class Display
     attr_accessor :frames
 
@@ -38,8 +37,9 @@ module GameDisplay
     end
 
     def add_line(text: '', align: :left)
-      lines.push(Line.new(text, align))
-      nil
+      new_line = Line.new(text, align)
+      lines.push(new_line)
+      new_line
     end
 
     def top_bottom_border
