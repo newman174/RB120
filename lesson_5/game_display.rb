@@ -32,7 +32,7 @@ module GameDisplay
     end
 
     def width
-      max_line_length = lines.empty? ? 0 : lines.map { |line| line.text.length }.max
+      max_line_length = lines.empty? ? 0 : lines.map { |ln| ln.text.length }.max
       max_line_length + TOTAL_PAD
     end
 
@@ -43,9 +43,9 @@ module GameDisplay
     end
 
     def top_bottom_border
-      "#{TOP_BOTTOM_DIV_SYM * width}"
+      TOP_BOTTOM_DIV_SYM * width
     end
-    
+
     def top_bottom_margin
       "#{SIDE_DIV_SYM}#{' ' * (width - 2)}#{SIDE_DIV_SYM}"
     end
@@ -69,7 +69,7 @@ module GameDisplay
     def print
       puts top_bottom_border
       TOP_BOTTOM_MARGIN_LINES.times { puts top_bottom_margin }
-      lines.each { |line| puts "#{left_border}#{line_to_s(line)}#{right_border}" }
+      lines.each { |ln| puts "#{left_border}#{line_to_s(ln)}#{right_border}" }
       TOP_BOTTOM_MARGIN_LINES.times { puts top_bottom_margin }
       puts top_bottom_border
     end

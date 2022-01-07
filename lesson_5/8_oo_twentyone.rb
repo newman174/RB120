@@ -1,45 +1,3 @@
-=begin
-
-Twenty-one is a card game consisting of a dealer and a player, where the
-participants try to get as close to 21 as possible without going over.
-
-Here is an overview of the game:
-- Both participants are initially dealt 2 cards from a 52-card deck.
-- The player takes the first turn, and can "hit" or "stay".
-- If the player busts, he loses. If he stays, it's the dealer's turn.
-- The dealer must hit until his cards add up until at least 17.
-- If he busts, the player wins. If both player and dealer stay, then the highest
-  total wins.
-- If both totals are equal, then it's a tie, and nobody wins.
-
-Nouns: card, player, dealer, participant, deck, game, total
-Verbs: deal, hit, stay, busts
-
-Player
-- hit
-- stay
-- busted?
-- total
-
-Dealer
-- hit
-- stay
-- busted?
-- total
-- deal (should this be here or in Deck?)
-
-Participant
-
-Deck
-- deal (should this be here or in Dealer?)
-
-Card
-Game
-- start
-
-=end
-
-require 'pry'
 require_relative 'game_display'
 
 module Prompt
@@ -76,11 +34,7 @@ class Participant
   end
 
   def discreet_total
-    if hand.all? { |card| card.visible }
-      total
-    else
-      '??'
-    end
+    hand.all?(&:visible) ? total : '??'
   end
 
   def display_total
@@ -118,10 +72,6 @@ class Player < Participant
 end
 
 class Dealer < Participant
-  def initialize(name)
-    super
-  end
-
   def deal(deck)
     super
     hand.last.visible = false
@@ -154,19 +104,21 @@ class Deck
 end
 
 class Card
-  VALUES = { 'A'   =>  1,
-             '2'     =>  2,
-             '3'     =>  3,
-             '4'     =>  4,
-             '5'     =>  5,
-             '6'     =>  6,
-             '7'     =>  7,
-             '8'     =>  8,
-             '9'     =>  9,
-             '10'    => 10,
-             'J'  => 10,
-             'Q' => 10,
-             'K'  => 10 }
+  VALUES = {
+    'A' =>  1,
+    '2' =>  2,
+    '3' =>  3,
+    '4' =>  4,
+    '5' =>  5,
+    '6' =>  6,
+    '7' =>  7,
+    '8' =>  8,
+    '9' =>  9,
+    '10' => 10,
+    'J' => 10,
+    'Q' => 10,
+    'K' => 10
+  }
 
   attr_accessor :name, :value, :suit, :visible
 
@@ -212,27 +164,12 @@ Here is an overview of the game:
   DEALER_STAY_AT = 17
 
   attr_accessor :deck, :player, :dealer, :participants, :winner
-  attr_accessor :display, :scoreboard
 
   def initialize
     self.deck = Deck.new
     self.player = Player.new("Mike")
     self.dealer = Dealer.new("CPU Dealer")
     self.participants = [dealer, player]
-    self.display = GameDisplay::Display.new
-    # setup_scoreboard
-  end
-
-  # def setup_scoreboard
-  #   Scoreboard = Struct.new('Scoreboard', :player, :dealer, :ties, :frame)
-  #   self.scoreboard = Scoreboard.new
-  #   scoreboard.player = 0
-  #   scoreboard.dealer = 0
-  #   scoreboard.frame = GameDisplay::Frame.new
-  # end
-
-  def update_scores(scoreboard)
-
   end
 
   def deal_cards
@@ -245,7 +182,7 @@ Here is an overview of the game:
     card_disp = GameDisplay::Display.new
     participants.each do |part|
       frame = GameDisplay::Frame.new
-      names_line = frame.add_line(text: "#{part}", align: :center)
+      frame.add_line(text: part.to_s, align: :center)
       frame.add_line
       part.hand.each do |card|
         frame.add_line(text: card.to_s)
@@ -310,8 +247,8 @@ Here is an overview of the game:
   end
 
   def show_result
-    participants.each { |part| part.display_total }
-  
+    participants.each(&:display_total)
+
     winner = determine_winner
     if winner == :tie
       prompt "It's a tie!"
@@ -360,7 +297,7 @@ Here is an overview of the game:
 
   def reset
     self.deck = Deck.new
-    participants.each { |part| part.reset_hand}
+    participants.each(&:reset_hand)
     clear
     prompt "New Game!"
     enter_to_continue
