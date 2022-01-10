@@ -22,16 +22,17 @@ class Order
   end
 
   def total
-    total_cost = @burger + @side + @drink
+    total_cost = @burger.cost + @side.cost + @drink.cost
     format("$%.2f", total_cost) # #format formats the cost to two decimal places
   end
 end
 
 class MealItem
-  attr_reader :option
+  attr_reader :cost
 
   def initialize
     @option = choose_option
+    @cost =   self.class::OPTIONS[@option][:cost]
   end
   
   def choose_option
@@ -53,9 +54,9 @@ class MealItem
     self.class::OPTIONS[@option][:name]
   end
 
-  def +(other)
-    self.class::OPTIONS[option][:cost] + other.class::OPTIONS[other.option][:cost]
-  end
+  # def +(other)
+  #   cost + other.cost
+  # end
 end
 
 class Burger < MealItem
